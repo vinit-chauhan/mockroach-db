@@ -6,6 +6,8 @@ import (
 	"io"
 	"net/http"
 	"time"
+
+	"github.com/fatih/color"
 )
 
 func greet() string {
@@ -29,6 +31,27 @@ func (w Weather) PrintOutput() {
 		w.Current.TempC,
 		w.Current.Condition.Text,
 	)
+
+	for _, hour := range w.Forecast.ForecastDay[0].Hour {
+		date := time.Unix(hour.TimeEpoch, 0)
+
+		if date.Before(time.Now()) && date.Hour() != time.Now().Hour() {
+			continue
+		}
+
+		msg := fmt.Sprintf("%s - %.0fC, %.0f, %s\n",
+			date.Format("Jan/02 15:04"),
+			hour.TempC,
+			hour.ChanceOfRain,
+			hour.Condition.Text,
+		)
+
+		if hour.ChanceOfRain < 40 {
+			fmt.Printf(msg)
+		} else {
+			color.Red(msg)
+		}
+	}
 }
 
 func (w *Weather) Fetch(api_key string, city string) *Weather {
