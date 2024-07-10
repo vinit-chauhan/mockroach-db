@@ -1,4 +1,4 @@
-package internal
+package pkg
 
 import (
 	"bufio"
@@ -8,9 +8,9 @@ import (
 	"strings"
 )
 
-func GetVars() (map[string]string, error) {
-	vars := map[string]string{}
+var vars = map[string]string{}
 
+func GetVars() (map[string]string, error) {
 	file, err := os.Open(".env")
 	if err != nil {
 		return nil, errors.New("error reading file")
