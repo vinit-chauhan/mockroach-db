@@ -77,8 +77,11 @@ func (w *Weather) Fetch(api_key string, city string) *Weather {
 	return w
 }
 
-func Run() {
+func Run(location string) {
 	fmt.Printf("Good %s!!!\n", greet())
+	fmt.Printf("Looking for weather of: ")
+	color.Blue(location)
+
 	env, err := GetVars()
 	if err != nil {
 		panic(fmt.Sprintf("PANIC: Unable to read env file: %s", err.Error()))
@@ -86,7 +89,7 @@ func Run() {
 
 	var weather Weather
 
-	weather.Fetch(env["API_KEY"], "Windsor")
+	weather.Fetch(env["API_KEY"], location)
 
 	weather.PrintOutput()
 }
