@@ -2,7 +2,8 @@ package main
 
 import (
 	"fmt"
-	"persistant-db/pkg"
+
+	"github.com/vinit-chauhan/persistant-db/pkg"
 )
 
 func main() {

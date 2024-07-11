@@ -2,7 +2,8 @@ package main
 
 import (
 	"os"
-	app "weather-cli/pkg"
+
+	app "github.com/vinit-chauhan/weather-cli/pkg"
 )
 
 func main() {
