@@ -4,48 +4,50 @@ import (
 	"log"
 	"os"
 
-	"github.com/vinit-chauhan/tasker/cmd/tasker"
+	cmd "github.com/vinit-chauhan/tasker/cmd/tasker"
 	"github.com/vinit-chauhan/tasker/internal/db/types"
 )
 
 func init() {
-	tasker.AddCmd.Flags().StringP(
+	// Adding flags to `AddCmd`
+	cmd.AddCmd.Flags().StringP(
 		"project",
 		"p",
 		"",
 		"specify a project for your task",
 	)
 
-	tasker.RootCmd.AddCommand(tasker.AddCmd)
-	tasker.RootCmd.AddCommand(tasker.WhereCmd)
-	tasker.RootCmd.AddCommand(tasker.ListCmd)
-	tasker.RootCmd.AddCommand(tasker.RemoveDBCmd)
-
-	tasker.UpdateCmd.Flags().StringP(
+	// Adding flags to `UpdateCmd`
+	cmd.UpdateCmd.Flags().StringP(
 		"name",
 		"n",
 		"",
 		"specify a name for your task",
 	)
-	tasker.UpdateCmd.Flags().StringP(
+	cmd.UpdateCmd.Flags().StringP(
 		"project",
 		"p",
 		"",
 		"specify a project for your task",
 	)
-
-	tasker.UpdateCmd.Flags().IntP(
+	cmd.UpdateCmd.Flags().IntP(
 		"status",
 		"s",
 		int(types.Todo),
 		"specify a status for your task (0: Backlog, 1: Waiting, 2: Todo, 3: InDesign, 4: InProgress, 5: Done)",
 	)
-	tasker.RootCmd.AddCommand(tasker.UpdateCmd)
 
+	// Declaring sub-commands to RootCmd
+	cmd.RootCmd.AddCommand(cmd.AddCmd)
+	cmd.RootCmd.AddCommand(cmd.DeleteCmd)
+	cmd.RootCmd.AddCommand(cmd.ListCmd)
+	cmd.RootCmd.AddCommand(cmd.RemoveDBCmd)
+	cmd.RootCmd.AddCommand(cmd.UpdateCmd)
+	cmd.RootCmd.AddCommand(cmd.WhereCmd)
 }
 
 func main() {
-	if err := tasker.RootCmd.Execute(); err != nil {
+	if err := cmd.RootCmd.Execute(); err != nil {
 		log.Fatalf("error executing root command: %v", err.Error())
 		os.Exit(1)
 	}
