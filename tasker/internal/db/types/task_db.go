@@ -20,6 +20,10 @@ func New(db *sql.DB, dir string) TaskDB {
 	}
 }
 
+func (t *TaskDB) GetDB() *sql.DB {
+	return t.db
+}
+
 func (t *TaskDB) TasksTableExists() bool {
 	qStr := fmt.Sprintf("SELECT * FROM %v", tableName)
 	if _, err := t.db.Query(qStr); err != nil {

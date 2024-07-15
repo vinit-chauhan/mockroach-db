@@ -15,7 +15,7 @@ import (
 )
 
 // opens a SQLite db and stores the db file in location specified by `path“
-func openDB(path string) (*types.TaskDB, error) {
+func OpenDB(path string) (*types.TaskDB, error) {
 	db, err := sql.Open("sqlite3", filepath.Join(path, "tasks.db"))
 	if err != nil {
 		return nil, err
