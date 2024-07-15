@@ -1,17 +1,17 @@
 package types
 
-type status int
+type Status int
 
 const (
-	backlog status = iota
-	waiting
-	todo
-	inDesign
-	inProgress
-	done
+	Backlog Status = iota
+	Waiting
+	Todo
+	InDesign
+	InProgress
+	Done
 )
 
-func (s status) String() string {
+func (s Status) String() string {
 	return [...]string{
 		"Backlog",
 		"Waiting",
@@ -24,22 +24,22 @@ func (s status) String() string {
 
 // Following functions are there to implement kancli.Status interface
 // - ( Next, Prev, Int )
-func (s status) Next() int {
-	if s == done {
-		return int(todo)
+func (s Status) Next() int {
+	if s == Done {
+		return int(Todo)
 	}
 
 	return int(s + 1)
 }
 
-func (s status) Prev() int {
-	if s == backlog {
-		return int(done)
+func (s Status) Prev() int {
+	if s == Backlog {
+		return int(Done)
 	}
 
 	return int(s - 1)
 }
 
-func (s status) Int() int {
+func (s Status) Int() int {
 	return int(s)
 }

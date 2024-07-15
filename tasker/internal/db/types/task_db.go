@@ -51,7 +51,7 @@ func (t *TaskDB) Insert(name, project string) error {
 		qry,
 		name,
 		project,
-		todo.String(),
+		Todo,
 		time.Now(),
 		time.Now(),
 	)
@@ -91,6 +91,7 @@ func (t *TaskDB) Update(task Task) error {
 		orig.Project,
 		orig.Status,
 		time.Now(),
+		orig.ID,
 	)
 
 	return err

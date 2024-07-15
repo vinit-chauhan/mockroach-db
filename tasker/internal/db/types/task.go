@@ -9,7 +9,7 @@ type Task struct {
 	ID      uint
 	Name    string
 	Project string
-	Status  status
+	Status  Status
 	Created time.Time
 	Updated time.Time
 }
@@ -29,6 +29,7 @@ func (t Task) Description() string {
 func (ot *Task) Merge(nt Task) {
 	uVal := reflect.ValueOf(&nt).Elem()
 	oVal := reflect.ValueOf(ot).Elem()
+	defaultDate := time.Time{}
 
 	for i := 0; i < uVal.NumField(); i++ {
 		uField := uVal.Field(i).Interface()
@@ -36,7 +37,10 @@ func (ot *Task) Merge(nt Task) {
 			if v, ok := uField.(int64); ok && uField != 0 {
 				oVal.Field(i).SetInt(v)
 			}
-			if v, ok := uField.(string); ok && uField != "" {
+
+			if v, ok := uField.(time.Time); ok && !v.Equal(defaultDate) {
+				oVal.Field(i).Set(reflect.ValueOf(v))
+			} else if v, ok := uField.(string); ok && uField != "" {
 				oVal.Field(i).SetString(v)
 			}
 		}
