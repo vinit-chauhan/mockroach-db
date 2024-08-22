@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+option go_package ="github.com/vinit-chauhan/grpc-demo/pb/ride";
+
+message Location {
+    double lat = 1;
+    double lon = 2;
+}
+
+
+enum RideType {
+    UNSET = 0;
+    REGULAR = 1;
+    POOL = 2;
+}
+
+message StartRequest {
+    string id = 1;
+    string driver_id = 2;
+    Location location = 3;
+    repeated string passenger_ids = 4;
+    google.protobuf.Timestamp start = 5;
+    google.protobuf.Timestamp end = 6;
+    double distance = 7;
+    RideType type = 8;
+}
+
+message StartResponse {
+    string id = 1;
+}
+
+service Rides {
+    rpc Start(StartRequest) returns (StartResponse) {}
+}
