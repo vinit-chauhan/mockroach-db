@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	Rides_Start_FullMethodName = "/Rides/Start"
+	Rides_End_FullMethodName   = "/Rides/End"
 )
 
 // RidesClient is the client API for Rides service.
@@ -27,6 +28,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type RidesClient interface {
 	Start(ctx context.Context, in *StartRequest, opts ...grpc.CallOption) (*StartResponse, error)
+	End(ctx context.Context, in *EndRequest, opts ...grpc.CallOption) (*EndResponse, error)
 }
 
 type ridesClient struct {
@@ -47,11 +49,22 @@ func (c *ridesClient) Start(ctx context.Context, in *StartRequest, opts ...grpc.
 	return out, nil
 }
 
+func (c *ridesClient) End(ctx context.Context, in *EndRequest, opts ...grpc.CallOption) (*EndResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(EndResponse)
+	err := c.cc.Invoke(ctx, Rides_End_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // RidesServer is the server API for Rides service.
 // All implementations must embed UnimplementedRidesServer
 // for forward compatibility.
 type RidesServer interface {
 	Start(context.Context, *StartRequest) (*StartResponse, error)
+	End(context.Context, *EndRequest) (*EndResponse, error)
 	mustEmbedUnimplementedRidesServer()
 }
 
@@ -64,6 +77,9 @@ type UnimplementedRidesServer struct{}
 
 func (UnimplementedRidesServer) Start(context.Context, *StartRequest) (*StartResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Start not implemented")
+}
+func (UnimplementedRidesServer) End(context.Context, *EndRequest) (*EndResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method End not implemented")
 }
 func (UnimplementedRidesServer) mustEmbedUnimplementedRidesServer() {}
 func (UnimplementedRidesServer) testEmbeddedByValue()               {}
@@ -104,6 +120,24 @@ func _Rides_Start_Handler(srv interface{}, ctx context.Context, dec func(interfa
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Rides_End_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EndRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RidesServer).End(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Rides_End_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RidesServer).End(ctx, req.(*EndRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Rides_ServiceDesc is the grpc.ServiceDesc for Rides service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -114,6 +148,10 @@ var Rides_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Start",
 			Handler:    _Rides_Start_Handler,
+		},
+		{
+			MethodName: "End",
+			Handler:    _Rides_End_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

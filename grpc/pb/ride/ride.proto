@@ -21,8 +21,7 @@ message StartRequest {
     string driver_id = 2;
     Location location = 3;
     repeated string passenger_ids = 4;
-    google.protobuf.Timestamp start = 5;
-    google.protobuf.Timestamp end = 6;
+    google.protobuf.Timestamp time = 5;
     double distance = 7;
     RideType type = 8;
 }
@@ -31,6 +30,18 @@ message StartResponse {
     string id = 1;
 }
 
+message EndRequest {
+    string id = 1;
+    google.protobuf.Timestamp end_time = 2;
+    double distance = 3;
+}
+
+
+message EndResponse {
+    string id = 1;
+}
+
 service Rides {
     rpc Start(StartRequest) returns (StartResponse) {}
+    rpc End(EndRequest) returns (EndResponse) {}
 }
