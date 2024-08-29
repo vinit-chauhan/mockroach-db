@@ -2,12 +2,18 @@ package server
 
 import (
 	"context"
+	"errors"
+	"fmt"
+	"io"
 	"log"
 	"net"
 
 	pb "github.com/vinit-chauhan/grpc-demo/pb/ride"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/reflection"
+	"google.golang.org/grpc/status"
 )
 
 type Rides struct {
@@ -15,7 +21,15 @@ type Rides struct {
 }
 
 func (r Rides) Start(ctx context.Context, req *pb.StartRequest) (*pb.StartResponse, error) {
-	log.Println("[Start] function invoked")
+	log.Println("[server][Start] function invoked")
+
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return nil, status.Error(codes.Unauthenticated, "error fetching metadata from context")
+	}
+
+	fmt.Println(md.Get("api_key"))
+
 	resp := pb.StartResponse{
 		Id: req.Id,
 	}
@@ -24,11 +38,42 @@ func (r Rides) Start(ctx context.Context, req *pb.StartRequest) (*pb.StartRespon
 }
 
 func (r Rides) End(ctx context.Context, req *pb.EndRequest) (*pb.EndResponse, error) {
-	log.Println("[End] function invoked")
+	log.Println("[server][End] function invoked")
 	resp := pb.EndResponse{
 		Id: req.Id,
 	}
 	return &resp, nil
+}
+
+func (r Rides) Location(stream pb.Rides_LocationServer) error {
+
+	count := int64(0)
+	DriverId := ""
+
+	for {
+		req, err := stream.Recv()
+		if errors.Is(err, io.EOF) {
+			break
+		}
+		if err != nil {
+			return status.Errorf(codes.Internal, "can't read")
+		}
+
+		DriverId = req.DriverId
+		count++
+
+		if count == 50 {
+			log.Printf("[server][Location] limit reached!!!")
+			break
+		}
+	}
+
+	resp := pb.LocationResponse{
+		DriverId: DriverId,
+		Count:    count,
+	}
+
+	return stream.SendAndClose(&resp)
 }
 
 func Run(ctx context.Context, started chan<- bool) {
@@ -46,10 +91,10 @@ func Run(ctx context.Context, started chan<- bool) {
 	pb.RegisterRidesServer(srv, &u)
 	reflection.Register(srv)
 
-	log.Printf("server listening on address: %s", addr)
+	log.Printf("[server] server listening on address: %s", addr)
 
 	go func() {
-		log.Println("sending signal to start client")
+		log.Println("[server] sending signal to start client")
 		started <- true
 	}()
 

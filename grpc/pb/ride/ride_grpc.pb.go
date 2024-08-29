@@ -19,8 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Rides_Start_FullMethodName = "/Rides/Start"
-	Rides_End_FullMethodName   = "/Rides/End"
+	Rides_Start_FullMethodName    = "/Rides/Start"
+	Rides_End_FullMethodName      = "/Rides/End"
+	Rides_Location_FullMethodName = "/Rides/Location"
 )
 
 // RidesClient is the client API for Rides service.
@@ -29,6 +30,7 @@ const (
 type RidesClient interface {
 	Start(ctx context.Context, in *StartRequest, opts ...grpc.CallOption) (*StartResponse, error)
 	End(ctx context.Context, in *EndRequest, opts ...grpc.CallOption) (*EndResponse, error)
+	Location(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[LocationRequest, LocationResponse], error)
 }
 
 type ridesClient struct {
@@ -59,12 +61,26 @@ func (c *ridesClient) End(ctx context.Context, in *EndRequest, opts ...grpc.Call
 	return out, nil
 }
 
+func (c *ridesClient) Location(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[LocationRequest, LocationResponse], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &Rides_ServiceDesc.Streams[0], Rides_Location_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[LocationRequest, LocationResponse]{ClientStream: stream}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type Rides_LocationClient = grpc.ClientStreamingClient[LocationRequest, LocationResponse]
+
 // RidesServer is the server API for Rides service.
 // All implementations must embed UnimplementedRidesServer
 // for forward compatibility.
 type RidesServer interface {
 	Start(context.Context, *StartRequest) (*StartResponse, error)
 	End(context.Context, *EndRequest) (*EndResponse, error)
+	Location(grpc.ClientStreamingServer[LocationRequest, LocationResponse]) error
 	mustEmbedUnimplementedRidesServer()
 }
 
@@ -80,6 +96,9 @@ func (UnimplementedRidesServer) Start(context.Context, *StartRequest) (*StartRes
 }
 func (UnimplementedRidesServer) End(context.Context, *EndRequest) (*EndResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method End not implemented")
+}
+func (UnimplementedRidesServer) Location(grpc.ClientStreamingServer[LocationRequest, LocationResponse]) error {
+	return status.Errorf(codes.Unimplemented, "method Location not implemented")
 }
 func (UnimplementedRidesServer) mustEmbedUnimplementedRidesServer() {}
 func (UnimplementedRidesServer) testEmbeddedByValue()               {}
@@ -138,6 +157,13 @@ func _Rides_End_Handler(srv interface{}, ctx context.Context, dec func(interface
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Rides_Location_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(RidesServer).Location(&grpc.GenericServerStream[LocationRequest, LocationResponse]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type Rides_LocationServer = grpc.ClientStreamingServer[LocationRequest, LocationResponse]
+
 // Rides_ServiceDesc is the grpc.ServiceDesc for Rides service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -154,6 +180,12 @@ var Rides_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Rides_End_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "Location",
+			Handler:       _Rides_Location_Handler,
+			ClientStreams: true,
+		},
+	},
 	Metadata: "pb/ride/ride.proto",
 }
