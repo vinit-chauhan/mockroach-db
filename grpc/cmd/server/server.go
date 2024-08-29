@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net"
+	"time"
 
 	pb "github.com/vinit-chauhan/grpc-demo/proto/ride"
 	"google.golang.org/grpc"
@@ -76,6 +77,17 @@ func (r Rides) Location(stream pb.Rides_LocationServer) error {
 	return stream.SendAndClose(&resp)
 }
 
+// It's Unary so It will only run for Start and End.
+func timingInterceptor(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
+	start := time.Now()
+	defer func() {
+		duration := time.Since(start)
+		log.Printf("[server][timingInterceptor] %s took %v", info.FullMethod, duration)
+	}()
+
+	return handler(ctx, req)
+}
+
 func Run(ctx context.Context, started chan<- bool) {
 	addr := ":9292"
 
@@ -85,7 +97,7 @@ func Run(ctx context.Context, started chan<- bool) {
 	}
 	defer lis.Close()
 
-	srv := grpc.NewServer()
+	srv := grpc.NewServer(grpc.UnaryInterceptor(timingInterceptor))
 	var u Rides
 
 	pb.RegisterRidesServer(srv, &u)

@@ -54,11 +54,9 @@ func run(ctx context.Context) {
 	}()
 
 	ctx = metadata.AppendToOutgoingContext(ctx, "api_key", "testK3y")
-
 	start(ctx, c)
 	end(ctx, c)
 	stream(ctx, c)
-
 }
 
 func stream(ctx context.Context, c pb.RidesClient) {
