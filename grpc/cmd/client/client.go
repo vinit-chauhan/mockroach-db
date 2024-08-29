@@ -11,7 +11,7 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	pb "github.com/vinit-chauhan/grpc-demo/pb/ride"
+	pb "github.com/vinit-chauhan/grpc-demo/proto/ride"
 )
 
 func Run(ctx context.Context, start <-chan bool) {

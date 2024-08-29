@@ -4,17 +4,17 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/vinit-chauhan/grpc-demo/pb/invoice"
+	pb "github.com/vinit-chauhan/grpc-demo/proto/invoice"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func ExampleInvoice() {
-	inv := invoice.Invoice{
+	inv := pb.Invoice{
 		Id:       "2023-0123",
 		Time:     timestamppb.New(time.Date(2023, time.January, 7, 13, 45, 0, 0, time.UTC)),
 		Customer: "Wile E. Coyote",
-		Items: []*invoice.LineItem{
+		Items: []*pb.LineItem{
 			{
 				Sku:    "hammer-20",
 				Amount: 1,

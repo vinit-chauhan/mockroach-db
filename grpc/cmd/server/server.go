@@ -8,7 +8,7 @@ import (
 	"log"
 	"net"
 
-	pb "github.com/vinit-chauhan/grpc-demo/pb/ride"
+	pb "github.com/vinit-chauhan/grpc-demo/proto/ride"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"

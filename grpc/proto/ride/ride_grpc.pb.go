@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v4.22.2
-// source: pb/ride/ride.proto
+// source: proto/ride/ride.proto
 
 package ride
 
@@ -187,5 +187,5 @@ var Rides_ServiceDesc = grpc.ServiceDesc{
 			ClientStreams: true,
 		},
 	},
-	Metadata: "pb/ride/ride.proto",
+	Metadata: "proto/ride/ride.proto",
 }
